@@ -14,6 +14,31 @@
 
 namespace wjson{
 
+namespace detail
+{
+
+template <class CharT, class Traits = std::char_traits<CharT>>
+struct ostreambuf : public std::basic_streambuf<CharT, Traits>
+{
+    ostreambuf(CharT* buffer, std::streamsize bufferLength)
+        : std::basic_streambuf<CharT, Traits>()
+    {
+        setp(buffer, buffer + bufferLength);
+    }
+};
+
+template <class CharT, class Traits = std::char_traits<CharT>>
+struct istreambuf : public std::basic_streambuf<CharT, Traits>
+{
+    istreambuf(CharT* buffer, std::streamsize bufferLength)
+        : std::basic_streambuf<CharT, Traits>()
+    {
+        setg(buffer, buffer, buffer + bufferLength);
+    }
+};
+
+}
+
 template<typename T, int R>
 class serializerF
 {
@@ -21,10 +46,11 @@ public:
   template<typename P>
   P operator()( T v, P end)
   {
-    std::stringstream ss;
     const size_t bufsize = ( R == -1 ? 20 : 20 + R ) ;
     char buf[bufsize]={'\0'};
-    ss.rdbuf()->pubsetbuf(buf, bufsize);
+    
+    detail::ostreambuf<char> streamBuf(buf, bufsize);
+    std::ostream ss(&streamBuf);
     if ( R == -1 ) 
     {
       ss << std::scientific;
@@ -61,8 +87,8 @@ public:
       return create_error<error_code::InvalidNumber>( e, end, std::distance(beg, end) );
     }
 
-    std::stringstream ss;
-    ss.rdbuf()->pubsetbuf( &(*beg), std::distance(beg, end) );
+    detail::istreambuf<char> streamBuf(const_cast<char*>(&(*beg)), std::distance(beg, end));
+    std::istream ss(&streamBuf);
     ss >> v;
     return parser::parse_number(beg, end, e);
   }

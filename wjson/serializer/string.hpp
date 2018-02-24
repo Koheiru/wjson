@@ -251,7 +251,7 @@ private:
        *((*vitr)++) = static_cast<char>( 128 | ( static_cast<unsigned char>( hex >> 6 ) & 63 ) );
        --n;
        if ( n==0)
-         return create_error<error_code::error_code::InvalidString>(e, end, std::distance(beg, end));
+         return create_error<error_code::InvalidString>(e, end, std::distance(beg, end));
        *((*vitr)++) = static_cast<char>( 128 | ( static_cast<unsigned char>( hex ) & 63 ) );
        --n;
     }
@@ -279,7 +279,7 @@ private:
     if ( c >= '0' && c<='9' ) return static_cast<Res>(  c - '0');
     if ( c >= 'a' && c<='f' ) return static_cast<Res>( (c - 'a') + 10 );
     if ( c >= 'A' && c<='F' ) return static_cast<Res>( (c - 'A') + 10 );
-    create_error<error_code::error_code::InvalidString>(e, static_cast<char*>(0));
+    create_error<error_code::InvalidString>(e, static_cast<char*>(0));
     return static_cast<Res>(0);
   }
 };
